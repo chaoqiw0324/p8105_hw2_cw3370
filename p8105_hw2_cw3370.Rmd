@@ -5,24 +5,44 @@ output: html_document
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(janitor)
+library(readxl)
 ```
 
-## R Markdown
-
-This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
-
-When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
-
-```{r cars}
-summary(cars)
+# Problem 1
+Read and clean the Mr. Trash Wheel sheet
+```{r}
+##specify the Mr. Trash Wheel sheet in the Excel file and to omit non-data entries
+mr_trash_wheel_df <- 
+  read_excel("data/Trash-Wheel-Collection-Totals-8-6-19.xlsx",sheet="Mr. Trash Wheel",range="A2:N408") %>% 
+  janitor::clean_names() 
+##omit rows that do not include dumpster-specific data
+mr_trash_wheel_df <- 
+  filter(mr_trash_wheel_df,dumpster!="NA") %>% 
+##round the number of sports balls to the nearest intege
+mr_trash_wheel_df$`sports_balls` <- round(mr_trash_wheel_df$`sports_balls`)
 ```
 
-## Including Plots
+Read and clean precipitation data for 2018 and 2019
+```{r}
+Precipitation2018_df <- 
+  read_excel("data/Trash-Wheel-Collection-Totals-8-6-19.xlsx",sheet="2018 Precipitation",range="A2:B14") %>% 
+  janitor::clean_names() %>%
+  mutate(month=month.name,year = 2018) %>% 
+  filter(otal!="NA")
 
-You can also embed plots, for example:
+Precipitation2019_df <- 
+  read_excel("data/Trash-Wheel-Collection-Totals-8-6-19.xlsx",sheet = "2019 Precipitation",range = "A2:B14") %>% 
+  janitor::clean_names() %>%
+  mutate(month = month.name,year = 2019) %>% 
+  filter(total != "NA")
 
-```{r pressure, echo=FALSE}
-plot(pressure)
+Precipitation_bind_df <- 
+  bind_rows(Precipitation2018_df,Precipitation2019_df) %>% 
+  relocate(year)
+
 ```
 
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+
+
