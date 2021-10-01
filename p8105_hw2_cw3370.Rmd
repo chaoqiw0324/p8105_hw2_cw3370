@@ -8,6 +8,7 @@ knitr::opts_chunk$set(echo = TRUE)
 library(tidyverse)
 library(janitor)
 library(readxl)
+library(lubridate)
 ```
 
 # Problem 1
@@ -44,5 +45,69 @@ Precipitation_bind_df <-
 
 ```
 
+# Problem 2
+```{r}
+#variable president:1 means the president was republican and -1 means the president was democratic
+pols_month_df <- 
+  read_csv("data/pols-month.csv") %>% 
+  janitor::clean_names() %>%
+  separate(mon,into=c("year","month","day"),sep = "-") %>% 
+  mutate(year = as.integer(year),
+         month = as.integer(month),
+         day = as.integer(day),
+         month = recode(month,`1`=month.name[1],`2`=month.name[2],`3`=month.name[3],`4`=month.name[4],`5`=month.name[5],`6`=month.name[6],`7`=month.name[7],`8`=month.name[8],`9`=month.name[9],`10`=month.name[10],`11`=month.name[11],`12`=month.name[12]),
+         president = prez_gop-prez_dem) %>% 
+  select(-prez_dem,-prez_gop,-day)
+
+snp_df <- 
+  read_csv("data/snp.csv") %>% 
+  janitor::clean_names() %>%
+  separate(date,into = c("month","day","year"),sep = "/") %>% 
+  mutate(year = as.integer(year),
+         month = as.integer(month),
+         day = as.integer(day)) %>% 
+  select(-day) %>% 
+  arrange(year,month) %>% 
+  mutate(month = recode(month,`1`=month.name[1],`2`=month.name[2],`3`=month.name[3],`4`=month.name[4],`5`=month.name[5],`6`=month.name[6],`7`=month.name[7],`8`=month.name[8],`9`=month.name[9],`10`=month.name[10],`11`=month.name[11],`12`=month.name[12]),
+         ) %>% 
+  relocate(year,month)
+
+unemployment_df <- 
+  read_csv("data/unemployment.csv") %>% 
+  janitor::clean_names() %>%
+  pivot_longer(
+    jan:dec,
+    names_to = "month",
+    values_to = "unemployment"
+  ) %>% 
+  mutate(month=recode(month,"jan"=month.name[1],"feb"=month.name[2],"mar"=month.name[3],"aapr"=month.name[4],"may"=month.name[5],"jun"=month.name[6],"jul"=month.name[7],"aug"=month.name[8],"sep"=month.name[9],"oct"=month.name[10],"nov"=month.name[11],"dec"=month.name[12]),
+         year = as.integer(year))
+
+join_df <- 
+  left_join(pols_month_df,snp_df,by = "year") %>% 
+  left_join(unemployment_df,by = "year") 
+
+## use date to join
+pols_month_df1 <- 
+  mutate(
+    pols_month_df,date = ymd(paste(as.character(year),month,1))
+  )
+
+snp_df1 <- 
+  mutate(
+    snp_df,date = ymd(paste(as.character(year),month,1))
+  )
+
+unemployment_df1 <- 
+  mutate(
+    unemployment_df,date = ymd(paste(as.character(year),month,1))
+  )
+
+join1_df <- 
+  left_join(pols_month_df1,snp_df1,by = "date") %>% 
+  left_join(unemployment_df1,by = "date") %>% 
+  select(-year.y,-month.y,-year,-month,-date)
+
+```
 
 
