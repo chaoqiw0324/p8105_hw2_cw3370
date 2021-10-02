@@ -17,12 +17,11 @@ library(lubridate)
 ##specify the Mr. Trash Wheel sheet in the Excel file and to omit non-data entries
 mr_trash_wheel_df <- 
   read_excel("data/Trash-Wheel-Collection-Totals-8-6-19.xlsx",sheet = "Mr. Trash Wheel",range = "A2:N408") %>% 
-  janitor::clean_names() 
-##omit rows that do not include dumpster-specific data
-mr_trash_wheel_df <- 
-  filter(mr_trash_wheel_df,dumpster != "NA") 
-##round the number of sports balls to the nearest integer
-mr_trash_wheel_df$`sports_balls` <- round(mr_trash_wheel_df$`sports_balls`)
+  janitor::clean_names() %>% 
+  ##omit rows that do not include dumpster-specific data
+  drop_na(dumpster) %>% 
+  ##round the number of sports balls to the nearest integer
+  mutate(sports_balls = round(sports_balls))
 ```
 <font size = 4 face="Times New Roman">Mr.Trash Wheel sheet includes `r nrow(mr_trash_wheel_df)` observations for `r ncol(mr_trash_wheel_df)` variables. For variables, they are `r colnames(mr_trash_wheel_df)`. 
 
@@ -40,13 +39,13 @@ Precipitation2018_df <-
   read_excel("data/Trash-Wheel-Collection-Totals-8-6-19.xlsx",sheet = "2018 Precipitation",range = "A2:B14") %>% 
   janitor::clean_names() %>%
   mutate(month = month.name,year = 2018) %>% 
-  filter(total != "NA")
+  drop_na(total)
 
 Precipitation2019_df <- 
   read_excel("data/Trash-Wheel-Collection-Totals-8-6-19.xlsx",sheet = "2019 Precipitation",range = "A2:B14") %>% 
   janitor::clean_names() %>%
   mutate(month = month.name,year = 2019) %>% 
-  filter(total != "NA")
+  drop_na(total)
 
 ##bind data together
 Precipitation_bind_df <- 
@@ -136,11 +135,12 @@ join1_df <-
   left_join(unemployment_df1,by = "date") %>% 
   select(-year.y,-month.y,-year,-month,-date)
 
+skimr::skim(join_df)
 ```
 
 <font size = 4 face="Times New Roman">We use two ways to join these data. The first one is to left join by year and month. The second one is to create a Date variable by ymd() and join by this Date variable. The outcome is same.
 
-join_df includes `r nrow(join_df)` observations of  `r ncol(join_df)` variables. It includes the number of national politicians who are democratic or republican from  year `r  min(select(pols_month_df,year))` to year`r `max(select(pols_month_df,year))`, Standard & Poor’s stock market index (S&P) from year `r  min(select(snp_df,year))` to year `r `max(select(snp_df,year))`,percentage of unemployment from year`r min(select(unemployment_df,year))` to year `r max(select(unemployment_df,year))`. 
+join_df includes `r nrow(join_df)` observations of  `r ncol(join_df)` variables. It includes the number of national politicians who are democratic or republican from  year `r  min(select(pols_month_df,year))` to year`r max(select(pols_month_df,year))`, Standard & Poor’s stock market index (S&P) from year `r  min(select(snp_df,year))` to year `r max(select(snp_df,year))`,percentage of unemployment from year`r min(select(unemployment_df,year))` to year `r max(select(unemployment_df,year))`. 
 
 The key variable in join_df is the same as three dataframe above. So l don't explain again.</font>
 
