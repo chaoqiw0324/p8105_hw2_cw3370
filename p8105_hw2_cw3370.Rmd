@@ -61,8 +61,10 @@ The total precipitation in 2018 is `r sum(pull(filter(Precipitation_bind_df,year
 The total precipitation in 2019 is `r sum(pull(filter(Precipitation_bind_df,year==2019),var = -1))`, only including `r  nrow(filter(Precipitation_bind_df,year==2019))` month.</font>
 
 # Problem 2
+### Read and clean the pols_month.csv, snp.csv and unemployment.csv
 ```{r}
 #variable president:1 means the president was republican and -1 means the president was democratic
+#we find that prez_gop has 5 wrong input 2, which should either be 1 or 0
 pols_month_df <- 
   read_csv("data/pols-month.csv") %>% 
   janitor::clean_names() %>%
@@ -71,7 +73,8 @@ pols_month_df <-
          month = as.integer(month),
          day = as.integer(day),
          month = recode(month,`1` = month.name[1],`2` = month.name[2],`3` = month.name[3],`4` = month.name[4],`5` = month.name[5],`6` = month.name[6],`7` = month.name[7],`8` = month.name[8],`9` = month.name[9],`10` = month.name[10],`11` = month.name[11],`12` = month.name[12]),
-         president = prez_gop - prez_dem) %>% 
+         president = as.numeric(prez_gop - prez_dem),
+         president = recode(president,'1' = "republican",'2' = "republican","-1" = "democratic")) %>% 
   select(-prez_dem,-prez_gop,-day)
 ```
 <font size = 4 face="Times New Roman">pols_month_df contains the data from 'pols_month.csv', including `r nrow(pols_month_df)` observations of `r ncol(pols_month_df)` related to the number of national politicians who are democratic or republican from  year `r min(select(pols_month_df,year))` to year `r `max(select(pols_month_df,year))`.
@@ -109,6 +112,8 @@ unemployment_df <-
 <font size = 4 face="Times New Roman">unemployment_df contains the data from unemployment.csv, including `r nrow(unemployment_df)` observations of `r ncol(unemployment_df)` variables related to the percentage of unemployment from year `r min(select(unemployment_df,year))` to year `r max(select(unemployment_df,year))`.
 
 `r colnames(unemployment_df)[1:2]` are the year and month. `r colnames(unemployment_df)[3]`are the percentage of unemployment.</font>
+
+### Combine three csv together
 ```{r}
 ## join by year and month
 join_df <- 
@@ -147,6 +152,7 @@ The key variable in join_df is the same as three dataframe above. So l don't exp
 
 # Problem 3
 
+### Read and clean the Popular_Baby_Names.csv
 <font size = 4 face="Times New Roman">Load and tidy the data.
 
 Adjust the ethnicity variable and name_of_child variable, omit the repeated observations</font>
@@ -169,6 +175,7 @@ popular_babyname_df1 <-
 
 ```
 
+### Table for Oliva among female baby and table for popular male baby name
 <font size = 4 face="Times New Roman">Popularity of the name "Oliva" as a female baby and popular male baby name</font>
 ```{r}
 oliva_df <- 
@@ -194,6 +201,7 @@ popular_male_name_df <-
 knitr::kable(popular_male_name_df)
 ```
 
+### Scatterplot for the number and rank of the name
 <font size = 4 face="Times New Roman">Produce a scatter plot showing the number of children with a name (y axis) against the rank in popularity of that name (x axis) for male, white non-hispanic children born in 2016</font>
 ```{r}
 male_wnh_2016_df <- 
