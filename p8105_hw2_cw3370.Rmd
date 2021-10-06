@@ -73,7 +73,7 @@ pols_month_df <-
          month = as.integer(month),
          day = as.integer(day),
          month = recode(month,`1` = month.name[1],`2` = month.name[2],`3` = month.name[3],`4` = month.name[4],`5` = month.name[5],`6` = month.name[6],`7` = month.name[7],`8` = month.name[8],`9` = month.name[9],`10` = month.name[10],`11` = month.name[11],`12` = month.name[12]),
-         president = as.numeric(prez_gop - prez_dem),
+         president = prez_gop - prez_dem,
          president = recode(president,'1' = "republican",'2' = "republican","-1" = "democratic")) %>% 
   select(-prez_dem,-prez_gop,-day)
 ```
