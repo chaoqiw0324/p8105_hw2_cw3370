@@ -17,7 +17,7 @@ library(knitr)
 ```{r}
 ##specify the Mr. Trash Wheel sheet in the Excel file and to omit non-data entries
 mr_trash_wheel_df <- 
-  read_excel("data/Trash-Wheel-Collection-Totals-8-6-19.xlsx",sheet = "Mr. Trash Wheel",range = "A2:N408") %>% 
+  read_excel("data/Trash-Wheel-Collection-Totals-7-2020-2.xlsx",sheet = "Mr. Trash Wheel",range = "A2:N408") %>% 
   janitor::clean_names() %>% 
   ##omit rows that do not include dumpster-specific data
   drop_na(dumpster) %>% 
@@ -37,13 +37,13 @@ The median number of sports balls in a dumpster in 2019 is `r median(pull(filter
 ## filter() to omit rows without precipitation data
 ## mutate() to add the variable year,change the variable month to character
 Precipitation2018_df <- 
-  read_excel("data/Trash-Wheel-Collection-Totals-8-6-19.xlsx",sheet = "2018 Precipitation",range = "A2:B14") %>% 
+  read_excel("data/Trash-Wheel-Collection-Totals-7-2020-2.xlsx",sheet = "2018 Precipitation",range = "A2:B14") %>% 
   janitor::clean_names() %>%
   mutate(month = month.name,year = 2018) %>% 
   drop_na(total)
 
 Precipitation2019_df <- 
-  read_excel("data/Trash-Wheel-Collection-Totals-8-6-19.xlsx",sheet = "2019 Precipitation",range = "A2:B14") %>% 
+  read_excel("data/Trash-Wheel-Collection-Totals-7-2020-2.xlsx",sheet = "2019 Precipitation",range = "A2:B14") %>% 
   janitor::clean_names() %>%
   mutate(month = month.name,year = 2019) %>% 
   drop_na(total)
@@ -58,7 +58,7 @@ Precipitation_bind_df <-
 
 The total precipitation in 2018 is `r sum(pull(filter(Precipitation_bind_df,year==2018),var = -1))`, including `r nrow(filter(Precipitation_bind_df,year==2018))` month. 
 
-The total precipitation in 2019 is `r sum(pull(filter(Precipitation_bind_df,year==2019),var = -1))`, only including `r  nrow(filter(Precipitation_bind_df,year==2019))` month.</font>
+The total precipitation in 2019 is `r sum(pull(filter(Precipitation_bind_df,year==2019),var = -1))`,also including `r  nrow(filter(Precipitation_bind_df,year==2019))` month.</font>
 
 # Problem 2
 ### Read and clean the pols_month.csv, snp.csv and unemployment.csv
@@ -212,6 +212,7 @@ ggplot(data = male_wnh_2016_df, aes(x = rank ,y = count,size = count)) +
     geom_point(size = 1) +
     labs(title = "Name ranks of male white non-hispanic children born in 2016" , x = "Rank of Name" , y = "Count of Name")
 
+show()
 ```
 
 
